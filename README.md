@@ -1,5 +1,6 @@
 # WCS-ToyModelProject
 First group project in WCS
+
 Introduction
 You are commissioned by a company selling models and scale models. 
 The company already has a database that lists employees, products, orders, and much more. 
