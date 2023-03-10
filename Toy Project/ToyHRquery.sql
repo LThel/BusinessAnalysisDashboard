@@ -1,5 +1,5 @@
 #HR KPI:Monthly, the 2 sellers with the highest turnover
-
+#just checking for changes
 select employeeNumber, firstName from employees order by employeeNumber desc;
 select customerNumber, salesRepEmployeeNumber from customers 
 where salesRepEmployeeNumber is not null;
