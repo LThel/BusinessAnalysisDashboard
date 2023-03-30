@@ -196,22 +196,22 @@ elif dash == 'Finance' :
     st.table(tempo_df)
     
    
-elif dash == 'Logistics'
+elif dash == 'Logistics':
 
-st.title('This is the logistics dashboard !')
+    st.title('This is the logistics dashboard !')
     
-st.header('these are the top 5 most products selled')
+    st.header('these are the top 5 most products selled')
     
-fig, ax = plt.subplots(2, figsize=(20,10))
-fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+    fig, ax = plt.subplots(2, figsize=(20,10))
+    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
 
-ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-ax[0].set_ylabel('Quantities ordered')
-ax[0].set_xlabel('products')
+    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+    ax[0].set_ylabel('Quantities ordered')
+    ax[0].set_xlabel('products')
 
 
-ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-ax[1].set_ylabel('quantity')
-ax[1].set_xlabel('products')
+    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
+    ax[1].set_ylabel('quantity')
+    ax[1].set_xlabel('products')
