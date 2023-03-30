@@ -215,3 +215,5 @@ elif dash == 'Logistics':
     ax[1].set_title('Left Stock', loc='left', fontweight='bold')
     ax[1].set_ylabel('quantity')
     ax[1].set_xlabel('products')
+
+    st.pyplot(fig)
