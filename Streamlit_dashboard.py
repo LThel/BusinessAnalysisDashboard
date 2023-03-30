@@ -240,34 +240,26 @@ elif dash == 'Logistics':
     ('Total Quantity ordered', 'Stock left', 'Average orders by month', 'how many month we have stock'))
     if fig_to_disp == 'Total Quantity ordered':
         fig_orders, ax_orders = plt.subplots()
-        plt.bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = 'red')
-        plt.set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-        plt.set_ylabel('Quantities ordered')
-        plt.set_xlabel('products')
+        plt.barh(df_log['productName'], df_log['Total_Quantity_Ordered'], color = 'red')
+        plt.title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
         st.pyplot(fig_orders)
    
     elif fig_to_disp == 'Stock left':
         fig_stockLeft, ax_stockL = plt.subplots()
         plt.barh(df_log['productName'], df_log['quantityInStock'], color = 'red')
-        plt.set_title('Left Stock', loc='left', fontweight='bold')
-        plt.set_ylabel('products')
-        plt.set_xlabel('quantity')
+        plt.title('Left Stock', loc='left', fontweight='bold')
         st.pyplot(fig_stockLeft)
    
     elif fig_to_disp == 'Average orders by month':
         fig_ordersByMonth, ax_ordersM = plt.subplots()
-        plt.bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = 'red')
-        plt.set_title('Average orders by month', loc='left', fontweight='bold')
-        plt.set_ylabel('quantity')
-        plt.set_xlabel('products') 
-        st.pyplot(ordersByMonth)
+        plt.barh(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = 'red')
+        plt.title('Average orders by month', loc='left', fontweight='bold')
+        st.pyplot(fig_ordersByMonth)
 
     elif fig_to_disp == 'how many month we have stock':
         fig_monthsWstock, ax_monthsStock = plt.subplots()
-        plt.scatter(df_log['productName'], df_log['How_many_months_left_we_have'], color = 'red')
-        plt.set_title('How many month we have stock', loc='left', fontweight='bold')
-        plt.set_ylabel('months')
-        plt.set_xlabel('products')
+        plt.barh(df_log['productName'], df_log['How_many_months_left_we_have'], color = 'red')
+        plt.title('How many month we have stock', loc='left', fontweight='bold')
         st.pyplot(fig_monthsWstock)
 #Sales
 elif dash == 'Sales':
