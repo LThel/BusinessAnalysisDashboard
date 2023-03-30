@@ -209,7 +209,11 @@ elif dash == 'Finance' :
             color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100), label = True)
     #fig3.colorbar(ax3.pcolor(ordered_df["Proportion of credit authorized already reached (in %)"]))
     st.pyplot(fig3)
+
     st.write("Maybe it's time to contact them ?")    
+
+    
+
     #Hide indexes
     # CSS to inject contained in a string
     hide_table_row_index = """
@@ -220,23 +224,31 @@ elif dash == 'Finance' :
             """
     # Inject CSS with Markdown
     st.markdown(hide_table_row_index, unsafe_allow_html=True)
+
     #tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
     #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
     st.table(ordered_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]])
 
-elif dash == "Logistics":
+
+    
+   
+elif dash == 'Logistics':
+
 
     st.title('This is the logistics dashboard !')
     
-    st.header('these are the top 5 best seller products')
+    st.header('these are the top 5 most products selled')
     
-    fig, ax = plt.subplots(2, figsize=(20,10))
-    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+    fig, ax = plt.subplots(4, figsize=(30,20))
+fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
 
-    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-    ax[0].set_ylabel('Quantities ordered')
-    ax[0].set_xlabel('products')
+fig, ax = plt.subplots(4, figsize=(30,20))
+fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+
+ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+ax[0].set_ylabel('Quantities ordered')
+ax[0].set_xlabel('products')
 
 
     ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
@@ -256,3 +268,20 @@ elif dash == 'Sales':
         plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022])
         plt.title ('Exchange Rate between 2021 and 2022')
         st.pyplot(fig_ExchR2021_2022)
+
+ax[1].barh(df_log['productName'], df_log['quantityInStock'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+ax[1].set_title('Left Stock', loc='left', fontweight='bold')
+ax[1].set_ylabel('products')
+ax[1].set_xlabel('quantity')
+
+ax[2].bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+ax[2].set_title('Average orders by month', loc='left', fontweight='bold')
+ax[2].set_ylabel('quantity')
+ax[2].set_xlabel('products')
+
+ax[3].scatter(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+ax[3].set_title('How many month we have stock', loc='left', fontweight='bold')
+ax[3].set_ylabel('months')
+ax[3].set_xlabel('products')
+st.pyplot(fig)
+
