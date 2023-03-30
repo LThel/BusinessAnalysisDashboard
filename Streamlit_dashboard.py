@@ -98,6 +98,32 @@ group by productCode) as AvgPerMonth
 inner join products as p on p.productCode = AvgPerMonth.productCode 
 order by Total_Quantity_Ordered desc;'''
 
+#Connect to Sales query
+query_sales = '''with aggregated_data as (
+    select month(o.orderDate)                       as month
+    , year(o.orderDate)                             as year
+    , sum(d.quantityOrdered * d.priceEach)           as sales
+    , p.productLine                                 as productLine
+    from orders o
+    join orderdetails d on o.orderNumber = d.orderNumber
+    join products p on d.productCode = p.productCode
+    group by month(o.orderDate), year(o.orderDate), p.productLine  
+
+)
+select currentYear.month as month
+, currentYear.year as year
+, currentYear.sales as sales
+, currentYear.productLine  as productLine
+, lastYear.sales as last_year_sales
+, if(lastYear.sales is null or lastYear.sales = 0 , 0, 
+(((currentYear.sales - lastYear.sales) / lastYear.sales) *100) ) as exchange_Rate
+from aggregated_data currentYear
+left join aggregated_data lastYear on currentYear.month = lastYear.month 
+                    and currentYear.year -1 = lastYear.year
+                    and currentYear.productLine = lastYear.productLine'''
+
+# Connecting the SQL table to the Python
+df_sales = pd.read_sql_query(query_sales,connection)
 
 
 
@@ -133,14 +159,17 @@ if dash == 'HR':
     #Best employee
     top1 = HR_df.Employee_Name.value_counts().head(1).index.format()
     to_write = 'Well done '+ str(top1[0]) + ' ! You are the best employee over the last years'
-    st.write(to_write)
+    st.subheader(to_write)
     col1, col2 = st.columns(2)
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(top1[0])])))
     col2.metric("Number of times in top 2", HR_df.Employee_Name.value_counts().head(1))
     
     #Select the name of the employee to see if he/she appears in the top2
     employee = st.selectbox('Select the name of the employee to see if he/she appears in our monthly top 2',(HR_df.Employee_Name.unique()))
-    st.write(employee, 'appears', HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0], 'time in our monthly top 2. Have a look at the stats :')
+    to_write_selemployee = str(employee) + ' appears ' + str(HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0]) +  ' time in our monthly top 2.'
+    #st.write(employee, 'appears', HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0], 'time in our monthly top 2. Have a look at the stats :')
+    st.subheader(to_write_selemployee)
+    st.write('Have a look at their stats :')
     col1, col2 = st.columns(2)
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(employee)])))
     col2.metric("Number of times in top 2", HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts())
@@ -175,13 +204,12 @@ elif dash == 'Finance' :
     ax3.set_xlabel('Customer Number')
     my_cmap = plt.get_cmap("Reds")
     ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
-    plt.bar(x= ordered_df['Customer Number'].astype(str),
+    ax3.bar(x= ordered_df['Customer Number'].astype(str),
             height = ordered_df["Customer's debt  ($)"],
-            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100))
+            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100), label = True)
+    #fig3.colorbar(ax3.pcolor(ordered_df["Proportion of credit authorized already reached (in %)"]))
     st.pyplot(fig3)
-    st.write("Maybe it's time to contact them ?")
-<<<<<<< Updated upstream
-    
+    st.write("Maybe it's time to contact them ?")    
     #Hide indexes
     # CSS to inject contained in a string
     hide_table_row_index = """
@@ -192,15 +220,9 @@ elif dash == 'Finance' :
             """
     # Inject CSS with Markdown
     st.markdown(hide_table_row_index, unsafe_allow_html=True)
-    tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
-    tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
-    st.table(tempo_df)
-    
-   
-=======
-
-    st.dataframe(df_fin2)
-    
+    #tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
+    #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
+    st.table(ordered_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]])
 
 elif dash == "Logistics":
 
@@ -222,4 +244,15 @@ elif dash == "Logistics":
     ax[1].set_ylabel('quantity')
     ax[1].set_xlabel('products')
     st.pyplot(fig)
->>>>>>> Stashed changes
+
+#Sales
+elif dash == 'Sales':
+    st.title ('Welcome to the Sales Dashboard')
+    fig_to_disp = st.radio(
+    "What exchange do you want to see ?",
+    ('Exchange Rate between 2021 and 2022', 'Exchange Rate between 2022 and 2023'))
+    if fig_to_disp == 'Exchange Rate between 2021 and 2022':
+        fig_ExchR2021_2022, ax_ExchR2021_2022 = plt.subplots()
+        plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022])
+        plt.title ('Exchange Rate between 2021 and 2022')
+        st.pyplot(fig_ExchR2021_2022)

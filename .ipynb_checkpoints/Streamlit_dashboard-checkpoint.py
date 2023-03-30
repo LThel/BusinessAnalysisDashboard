@@ -83,6 +83,48 @@ on c.customerNumber = apc.customerNumber
 group by c.salesRepEmployeeNumber, MONTH(apc.orderDate), YEAR(apc.orderDate)) as almFinal) as almFinal) as almFinal 
 on almFinal.Employee_Number = e.employeeNumber)'''
 
+query_log = '''select p.productCode, p.productName, AvgPerMonth.Total_Quantity_Ordered, p.quantityInStock,  AvgPerMonth.average_quantity_orders_by_month as Average_quantity_orders_by_month, quantityInStock/AvgPerMonth.average_quantity_orders_by_month as How_many_months_left_we_have 
+from 
+(select od.productCode, (sum(od.quantityOrdered)/(count(distinct(month(o.orderDate)))*count(distinct(year(o.orderDate))))) as Average_quantity_orders_by_month, sum(od.quantityOrdered) as Total_Quantity_Ordered
+from orders as o 
+inner join orderdetails as od on o.orderNumber = od.orderNumber 
+where od.productCode in
+(select odbis.productCode
+from (select od.productCode 
+from orderdetails as od 
+group by productCode 
+order by sum(od.quantityOrdered) desc limit 5) as odbis) 
+group by productCode) as AvgPerMonth
+inner join products as p on p.productCode = AvgPerMonth.productCode 
+order by Total_Quantity_Ordered desc;'''
+
+#Connect to Sales query
+query_sales = '''with aggregated_data as (
+    select month(o.orderDate)                       as month
+    , year(o.orderDate)                             as year
+    , sum(d.quantityOrdered * d.priceEach)           as sales
+    , p.productLine                                 as productLine
+    from orders o
+    join orderdetails d on o.orderNumber = d.orderNumber
+    join products p on d.productCode = p.productCode
+    group by month(o.orderDate), year(o.orderDate), p.productLine  
+
+)
+select currentYear.month as month
+, currentYear.year as year
+, currentYear.sales as sales
+, currentYear.productLine  as productLine
+, lastYear.sales as last_year_sales
+, if(lastYear.sales is null or lastYear.sales = 0 , 0, 
+(((currentYear.sales - lastYear.sales) / lastYear.sales) *100) ) as exchange_Rate
+from aggregated_data currentYear
+left join aggregated_data lastYear on currentYear.month = lastYear.month 
+                    and currentYear.year -1 = lastYear.year
+                    and currentYear.productLine = lastYear.productLine'''
+
+# Connecting the SQL table to the Python
+df_sales = pd.read_sql_query(query_sales,connection)
+
 
 
 #HR
@@ -97,6 +139,8 @@ df_fin2 = df_fin2.iloc[:,[0,1,4,5]]
 df_fin1 = df_fin1.rename(columns={"country":"Country", "amount_due":"Total sales (in $)", "Number_of_order" : "Total orders"})
 df_fin2 = df_fin2.rename(columns={"customerNumber": "Customer Number", "phone": "Phone Number", "Still_have_to_be_paid": "Customer's debt  ($)", "Proportion_of_credit_allows_already_reached": "Proportion of credit authorized already reached (in %)"})
 
+ #logistics
+df_log = pd.read_sql_query(query_log, connection)
 
 #Streamlite
 st.set_page_config(
@@ -115,14 +159,17 @@ if dash == 'HR':
     #Best employee
     top1 = HR_df.Employee_Name.value_counts().head(1).index.format()
     to_write = 'Well done '+ str(top1[0]) + ' ! You are the best employee over the last years'
-    st.write(to_write)
+    st.subheader(to_write)
     col1, col2 = st.columns(2)
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(top1[0])])))
     col2.metric("Number of times in top 2", HR_df.Employee_Name.value_counts().head(1))
     
     #Select the name of the employee to see if he/she appears in the top2
     employee = st.selectbox('Select the name of the employee to see if he/she appears in our monthly top 2',(HR_df.Employee_Name.unique()))
-    st.write(employee, 'appears', HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0], 'time in our monthly top 2. Have a look at the stats :')
+    to_write_selemployee = str(employee) + ' appears ' + str(HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0]) +  ' time in our monthly top 2.'
+    #st.write(employee, 'appears', HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0], 'time in our monthly top 2. Have a look at the stats :')
+    st.subheader(to_write_selemployee)
+    st.write('Have a look at their stats :')
     col1, col2 = st.columns(2)
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(employee)])))
     col2.metric("Number of times in top 2", HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts())
@@ -157,15 +204,12 @@ elif dash == 'Finance' :
     ax3.set_xlabel('Customer Number')
     my_cmap = plt.get_cmap("Reds")
     ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
-    plt.bar(x= ordered_df['Customer Number'].astype(str),
+    ax3.bar(x= ordered_df['Customer Number'].astype(str),
             height = ordered_df["Customer's debt  ($)"],
-            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100))
-    
-    
-#    plt.bar(x= df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False).iloc[:,0].astype(str), height = df_fin2.sort_values(by = "Customer's debt  ($)",  ascending = False).iloc[:,2], color=my_cmap(df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False).iloc[:,3]/100), label = True)
+            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100), label = True)
+    #fig3.colorbar(ax3.pcolor(ordered_df["Proportion of credit authorized already reached (in %)"]))
     st.pyplot(fig3)
-    st.write("Maybe it's time to contact them ?")
-    
+    st.write("Maybe it's time to contact them ?")    
     #Hide indexes
     # CSS to inject contained in a string
     hide_table_row_index = """
@@ -176,8 +220,39 @@ elif dash == 'Finance' :
             """
     # Inject CSS with Markdown
     st.markdown(hide_table_row_index, unsafe_allow_html=True)
-    tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
-    tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
-    st.table(tempo_df)
+    #tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
+    #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
+    st.table(ordered_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]])
+
+elif dash == "Logistics":
+
+    st.title('This is the logistics dashboard !')
     
-   
+    st.header('these are the top 5 best seller products')
+    
+    fig, ax = plt.subplots(2, figsize=(20,10))
+    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+
+    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+    ax[0].set_ylabel('Quantities ordered')
+    ax[0].set_xlabel('products')
+
+
+    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
+    ax[1].set_ylabel('quantity')
+    ax[1].set_xlabel('products')
+    st.pyplot(fig)
+
+#Sales
+elif dash == 'Sales':
+    st.title ('Welcome to the Sales Dashboard')
+    fig_to_disp = st.radio(
+    "What exchange do you want to see ?",
+    ('Exchange Rate between 2021 and 2022', 'Exchange Rate between 2022 and 2023'))
+    if fig_to_disp == 'Exchange Rate between 2021 and 2022':
+        fig_ExchR2021_2022, ax_ExchR2021_2022 = plt.subplots()
+        plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022])
+        plt.title ('Exchange Rate between 2021 and 2022')
+        st.pyplot(fig_ExchR2021_2022)
