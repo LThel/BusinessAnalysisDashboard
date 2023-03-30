@@ -202,18 +202,27 @@ elif dash == 'Logistics':
     
     st.header('these are the top 5 most products selled')
     
-    fig, ax = plt.subplots(2, figsize=(20,10))
-    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+    fig, ax = plt.subplots(4, figsize=(30,20))
+fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
 
-    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-    ax[0].set_ylabel('Quantities ordered')
-    ax[0].set_xlabel('products')
+ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+ax[0].set_ylabel('Quantities ordered')
+ax[0].set_xlabel('products')
 
 
-    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-    ax[1].set_ylabel('quantity')
-    ax[1].set_xlabel('products')
+ax[1].bar(df_log['productName'], df_log['quantityInStock'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+ax[1].set_title('Left Stock', loc='left', fontweight='bold')
+ax[1].set_ylabel('quantity')
+ax[1].set_xlabel('products')
 
-    st.pyplot(fig)
+ax[2].bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+ax[2].set_title('Average orders by month', loc='left', fontweight='bold')
+ax[2].set_ylabel('quantity')
+ax[2].set_xlabel('products')
+
+ax[3].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+ax[3].set_title('How many month we have stock', loc='left', fontweight='bold')
+ax[3].set_ylabel('months')
+ax[3].set_xlabel('products')
+st.pyplot(fig)
