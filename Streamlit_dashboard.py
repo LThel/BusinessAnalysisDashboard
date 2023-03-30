@@ -164,6 +164,10 @@ if dash == 'HR':
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(top1[0])])))
     col2.metric("Number of times in top 2", HR_df.Employee_Name.value_counts().head(1))
     
+    #Top employees table
+    top_x = st.slider('Do you want to see our top employees ?', 0, 20, 5)
+    st.table(HR_df.Employee_Name.value_counts().head(top_x).index.format())
+    
     #Select the name of the employee to see if he/she appears in the top2
     employee = st.selectbox('Select the name of the employee to see if he/she appears in our monthly top 2',(HR_df.Employee_Name.unique()))
     to_write_selemployee = str(employee) + ' appears ' + str(HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0]) +  ' time in our monthly top 2.'
@@ -174,7 +178,7 @@ if dash == 'HR':
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(employee)])))
     col2.metric("Number of times in top 2", HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts())
     #if (HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts() > 5) :
-    st.balloons()
+    #st.balloons()
     
                 #Select a date to see the top 2 employee
     date = st.selectbox(
@@ -264,17 +268,23 @@ elif dash == 'Logistics':
 #Sales
 elif dash == 'Sales':
     st.title ('Welcome to the Sales Dashboard')
+    fig_sale1, ax_sale1 = plt.subplots()
+    plt.bar(df_sales ['productLine'], df_sales['sales'], color = 'red')
+    plt.title('Sales per product line')
+    plt.xticks(rotation=90)   
+    st.pyplot(fig_sale1)
+    
     fig_to_disp = st.radio(
     "What exchange do you want to see ?",
     ('Exchange Rate between 2021 and 2022', 'Exchange Rate between 2022 and 2023'))
     if fig_to_disp == 'Exchange Rate between 2021 and 2022':
         fig_ExchR2021_2022, ax_ExchR2021_2022 = plt.subplots()
-        plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022])
+        plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022], color = 'red')
         plt.title ('Exchange Rate between 2021 and 2022')
         st.pyplot(fig_ExchR2021_2022)
     elif fig_to_disp == 'Exchange Rate between 2022 and 2023':
         fig_ExchR2022_2023, ax_ExchR2022_2023 = plt.subplots()
-        plt.bar(df_sales ['month'][df_sales['year'] == 2023] , df_sales ['exchange_Rate'][df_sales['year'] == 2023])
+        plt.bar(df_sales ['month'][df_sales['year'] == 2023] , df_sales ['exchange_Rate'][df_sales['year'] == 2023], color = 'red')
         plt.title ('Exchange Rate between 2022 and 2023')
         st.pyplot(fig_ExchR2022_2023)
     
