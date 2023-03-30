@@ -153,6 +153,17 @@ dash = st.sidebar.radio(
     "What dashboard do you want to see ?",
     ('Sales', 'Finance', 'Logistics', 'HR'))
  
+#Hide indexes
+# CSS to inject contained in a string
+hide_table_row_index = """
+        <style>
+        thead tr th:first-child {display:none}
+        tbody th {display:none}
+        </style>
+        """
+# Inject CSS with Markdown
+st.markdown(hide_table_row_index, unsafe_allow_html=True)
+    
 #HR
 if dash == 'HR':
     st.title('Welcome to the HR dashboard !')
@@ -166,7 +177,13 @@ if dash == 'HR':
     
     #Top employees table
     top_x = st.slider('Do you want to see our top employees ?', 0, 20, 5)
-    st.table(HR_df.Employee_Name.value_counts().head(top_x).index.format())
+    year_top_x = st.radio(    "Select the year",
+    ('All the years', 2023, 2022, 2021))
+    if year_top_x == 'All the years' :
+        st.table(HR_df.Employee_Name.value_counts().head(top_x).index.format())
+    else :
+        st.table(HR_df['Employee_Name'][HR_df['month_year_bis'].dt.year==year_top_x].value_counts().head(top_x).index.format())
+    
     
     #Select the name of the employee to see if he/she appears in the top2
     employee = st.selectbox('Select the name of the employee to see if he/she appears in our monthly top 2',(HR_df.Employee_Name.unique()))
@@ -216,18 +233,6 @@ elif dash == 'Finance' :
 
     st.write("Maybe it's time to contact them ?")    
 
-    
-
-    #Hide indexes
-    # CSS to inject contained in a string
-    hide_table_row_index = """
-            <style>
-            thead tr th:first-child {display:none}
-            tbody th {display:none}
-            </style>
-            """
-    # Inject CSS with Markdown
-    st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
     #tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
     #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]

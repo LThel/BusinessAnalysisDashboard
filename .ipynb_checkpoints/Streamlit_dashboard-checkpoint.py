@@ -153,6 +153,17 @@ dash = st.sidebar.radio(
     "What dashboard do you want to see ?",
     ('Sales', 'Finance', 'Logistics', 'HR'))
  
+#Hide indexes
+# CSS to inject contained in a string
+hide_table_row_index = """
+        <style>
+        thead tr th:first-child {display:none}
+        tbody th {display:none}
+        </style>
+        """
+# Inject CSS with Markdown
+st.markdown(hide_table_row_index, unsafe_allow_html=True)
+    
 #HR
 if dash == 'HR':
     st.title('Welcome to the HR dashboard !')
@@ -166,7 +177,13 @@ if dash == 'HR':
     
     #Top employees table
     top_x = st.slider('Do you want to see our top employees ?', 0, 20, 5)
-    st.table(HR_df.Employee_Name.value_counts().head(top_x).index.format())
+    year_top_x = st.radio(    "Select the year",
+    ('All the years', 2023, 2022, 2021))
+    if year_top_x == 'All the years' :
+        st.table(HR_df.Employee_Name.value_counts().head(top_x).index.format())
+    else :
+        st.table(HR_df['Employee_Name'][HR_df['month_year_bis'].dt.year==year_top_x].value_counts().head(top_x).index.format())
+    
     
     #Select the name of the employee to see if he/she appears in the top2
     employee = st.selectbox('Select the name of the employee to see if he/she appears in our monthly top 2',(HR_df.Employee_Name.unique()))
@@ -216,55 +233,39 @@ elif dash == 'Finance' :
 
     st.write("Maybe it's time to contact them ?")    
 
-    
-
-    #Hide indexes
-    # CSS to inject contained in a string
-    hide_table_row_index = """
-            <style>
-            thead tr th:first-child {display:none}
-            tbody th {display:none}
-            </style>
-            """
-    # Inject CSS with Markdown
-    st.markdown(hide_table_row_index, unsafe_allow_html=True)
 
     #tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
     #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
     st.table(ordered_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]])
 
 elif dash == 'Logistics':
-    st.title('This is the logistics dashboard !')
-    
-    st.header('these are the top 5 most products selled')
-    
-    fig, ax = plt.subplots(4, figsize=(30,20))
-    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+    st.title ('This is the logistics dashboard !')
+    fig_to_disp = st.radio(
+    "You can see four different graphics",
+    ('Total Quantity ordered', 'Stock left', 'Average orders by month', 'how many month we have stock'))
+    if fig_to_disp == 'Total Quantity ordered':
+        fig_orders, ax_orders = plt.subplots()
+        plt.barh(df_log['productName'], df_log['Total_Quantity_Ordered'], color = 'red')
+        plt.title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+        st.pyplot(fig_orders)
+   
+    elif fig_to_disp == 'Stock left':
+        fig_stockLeft, ax_stockL = plt.subplots()
+        plt.barh(df_log['productName'], df_log['quantityInStock'], color = 'red')
+        plt.title('Left Stock', loc='left', fontweight='bold')
+        st.pyplot(fig_stockLeft)
+   
+    elif fig_to_disp == 'Average orders by month':
+        fig_ordersByMonth, ax_ordersM = plt.subplots()
+        plt.barh(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = 'red')
+        plt.title('Average orders by month', loc='left', fontweight='bold')
+        st.pyplot(fig_ordersByMonth)
 
-    fig, ax = plt.subplots(4, figsize=(30,20))
-    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
-
-    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-    ax[0].set_ylabel('Quantities ordered')
-    ax[0].set_xlabel('products')
-
-    ax[1].barh(df_log['productName'], df_log['quantityInStock'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-    ax[1].set_ylabel('products')
-    ax[1].set_xlabel('quantity')
-
-    ax[2].bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-    ax[2].set_title('Average orders by month', loc='left', fontweight='bold')
-    ax[2].set_ylabel('quantity')
-    ax[2].set_xlabel('products')
-
-    ax[3].scatter(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-    ax[3].set_title('How many month we have stock', loc='left', fontweight='bold')
-    ax[3].set_ylabel('months')
-    ax[3].set_xlabel('products')
-    st.pyplot(fig)
-    
+    elif fig_to_disp == 'how many month we have stock':
+        fig_monthsWstock, ax_monthsStock = plt.subplots()
+        plt.barh(df_log['productName'], df_log['How_many_months_left_we_have'], color = 'red')
+        plt.title('How many month we have stock', loc='left', fontweight='bold')
+        st.pyplot(fig_monthsWstock)
 #Sales
 elif dash == 'Sales':
     st.title ('Welcome to the Sales Dashboard')
