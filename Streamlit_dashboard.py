@@ -213,12 +213,15 @@ elif dash == 'Finance' :
     sns.barplot(x = df_fin1['Country'], y = df_fin1['Total sales (in $)'], order=df_fin1.sort_values('Total sales (in $)', ascending = False).Country, color = 'red')
     plt.xticks(rotation=90)
     st.pyplot(fig2)
+    total_turnover = sum(df_fin1['Total sales (in $)'])
+    write_turnover = "The total turnover for the last 2 months reaches $" + str(round(total_turnover)) + "."
+    st.subheader(write_turnover)
     #Finance 2
     # Find the total debt 
     total_debt = sum(df_fin2["Customer's debt  ($)"]) 
     total_debt = round(total_debt)
     to_disp = 'But we still have $' + str(total_debt) + " to take back ! Where is our money then ?"
-    st.header(to_disp)
+    st.subheader(to_disp)
     fig3, ax3 = plt.subplots()
     ax3.set_title('Debt (in $) per customer')
     ax3.set_ylabel('Amount (in $)')
