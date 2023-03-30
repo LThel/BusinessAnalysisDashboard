@@ -169,12 +169,12 @@ if dash == 'HR':
     to_write_selemployee = str(employee) + ' appears ' + str(HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0]) +  ' time in our monthly top 2.'
     #st.write(employee, 'appears', HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0], 'time in our monthly top 2. Have a look at the stats :')
     st.subheader(to_write_selemployee)
-    st.write('Have a look at their stats :')
+    st.write('Have a look at its stats :')
     col1, col2 = st.columns(2)
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(employee)])))
     col2.metric("Number of times in top 2", HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts())
     #if (HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts() > 5) :
-    #   st.balloons()
+    st.balloons()
     
                 #Select a date to see the top 2 employee
     date = st.selectbox(
@@ -229,34 +229,38 @@ elif dash == 'Finance' :
     #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
     st.table(ordered_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]])
 
-
-    
-   
 elif dash == 'Logistics':
-
-
     st.title('This is the logistics dashboard !')
     
     st.header('these are the top 5 most products selled')
     
     fig, ax = plt.subplots(4, figsize=(30,20))
-fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
 
-fig, ax = plt.subplots(4, figsize=(30,20))
-fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+    fig, ax = plt.subplots(4, figsize=(30,20))
+    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
 
-ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-ax[0].set_ylabel('Quantities ordered')
-ax[0].set_xlabel('products')
+    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+    ax[0].set_ylabel('Quantities ordered')
+    ax[0].set_xlabel('products')
 
-
-    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[1].barh(df_log['productName'], df_log['quantityInStock'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
     ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-    ax[1].set_ylabel('quantity')
-    ax[1].set_xlabel('products')
-    st.pyplot(fig)
+    ax[1].set_ylabel('products')
+    ax[1].set_xlabel('quantity')
 
+    ax[2].bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+    ax[2].set_title('Average orders by month', loc='left', fontweight='bold')
+    ax[2].set_ylabel('quantity')
+    ax[2].set_xlabel('products')
+
+    ax[3].scatter(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
+    ax[3].set_title('How many month we have stock', loc='left', fontweight='bold')
+    ax[3].set_ylabel('months')
+    ax[3].set_xlabel('products')
+    st.pyplot(fig)
+    
 #Sales
 elif dash == 'Sales':
     st.title ('Welcome to the Sales Dashboard')
@@ -268,20 +272,11 @@ elif dash == 'Sales':
         plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022])
         plt.title ('Exchange Rate between 2021 and 2022')
         st.pyplot(fig_ExchR2021_2022)
+    elif fig_to_disp == 'Exchange Rate between 2022 and 2023':
+        fig_ExchR2022_2023, ax_ExchR2022_2023 = plt.subplots()
+        plt.bar(df_sales ['month'][df_sales['year'] == 2023] , df_sales ['exchange_Rate'][df_sales['year'] == 2023])
+        plt.title ('Exchange Rate between 2022 and 2023')
+        st.pyplot(fig_ExchR2022_2023)
+    
 
-ax[1].barh(df_log['productName'], df_log['quantityInStock'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-ax[1].set_ylabel('products')
-ax[1].set_xlabel('quantity')
-
-ax[2].bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-ax[2].set_title('Average orders by month', loc='left', fontweight='bold')
-ax[2].set_ylabel('quantity')
-ax[2].set_xlabel('products')
-
-ax[3].scatter(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'cyan', 'green', 'yellow'])
-ax[3].set_title('How many month we have stock', loc='left', fontweight='bold')
-ax[3].set_ylabel('months')
-ax[3].set_xlabel('products')
-st.pyplot(fig)
 
