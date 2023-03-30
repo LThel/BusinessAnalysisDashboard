@@ -156,7 +156,10 @@ elif dash == 'Finance' :
     ax3.set_ylabel('Amount (in $)')
     ax3.set_xlabel('Customer Number')
     my_cmap = plt.get_cmap("Reds")
-    plt.bar(x= df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False).iloc[:,0].astype(str), height = df_fin2.sort_values(by = "Customer's debt  ($)",  ascending = False).iloc[:,2], color=my_cmap(df_fin2["Proportion of credit authorized already reached (in %)"]/100), label = True)
+    ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
+    plt.bar(x= ordered_df['Customer Number'].astype(str),
+            height = ordered_df["Customer's debt  ($)"],
+            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100))
     st.pyplot(fig3)
     st.write("Maybe it's time to contact them ?")
     
@@ -174,3 +177,4 @@ elif dash == 'Finance' :
     tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
     st.table(tempo_df)
     
+   

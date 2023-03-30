@@ -2,9 +2,10 @@ import streamlit as st
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
-import sqlalchemy as sql
+#import sqlalchemy as sql
 from collections import Counter
 import mysql.connector
+from datetime import datetime
 
 #Connect to Python
 #connection = 'mysql://toyscie:WILD4Rdata!@51.178.25.157:23456/toys_and_models'
@@ -83,23 +84,11 @@ group by c.salesRepEmployeeNumber, MONTH(apc.orderDate), YEAR(apc.orderDate)) as
 on almFinal.Employee_Number = e.employeeNumber)'''
 
 
-query_log = '''select p.productCode, p.productName, AvgPerMonth.Total_Quantity_Ordered, p.quantityInStock,  AvgPerMonth.average_quantity_orders_by_month as Average_quantity_orders_by_month, quantityInStock/AvgPerMonth.average_quantity_orders_by_month as How_many_months_left_we_have 
-from 
-(select od.productCode, (sum(od.quantityOrdered)/(count(distinct(month(o.orderDate)))*count(distinct(year(o.orderDate))))) as Average_quantity_orders_by_month, sum(od.quantityOrdered) as Total_Quantity_Ordered
-from orders as o 
-inner join orderdetails as od on o.orderNumber = od.orderNumber 
-where od.productCode in
-(select odbis.productCode
-from (select od.productCode 
-from orderdetails as od 
-group by productCode 
-order by sum(od.quantityOrdered) desc limit 5) as odbis) 
-group by productCode) as AvgPerMonth
-inner join products as p on p.productCode = AvgPerMonth.productCode 
-order by Total_Quantity_Ordered desc;'''
 
 #HR
 HR_df = pd.read_sql_query(query_HR, connection)
+HR_df['month_year_bis'] = HR_df['month_year'].apply(lambda x: datetime.strptime(x, '%m-%Y'))
+HR_df = HR_df.sort_values(by = 'month_year_bis')
 
 #Finance
 df_fin1 = pd.read_sql_query(query_finance1, connection)
@@ -107,9 +96,7 @@ df_fin2 = pd.read_sql_query(query_finance2, connection)
 df_fin2 = df_fin2.iloc[:,[0,1,4,5]]
 df_fin1 = df_fin1.rename(columns={"country":"Country", "amount_due":"Total sales (in $)", "Number_of_order" : "Total orders"})
 df_fin2 = df_fin2.rename(columns={"customerNumber": "Customer Number", "phone": "Phone Number", "Still_have_to_be_paid": "Customer's debt  ($)", "Proportion_of_credit_allows_already_reached": "Proportion of credit authorized already reached (in %)"})
- 
- #logistics
- df_log = pd.read_sql_query(query_log, connection)
+
 
 #Streamlite
 st.set_page_config(
@@ -139,8 +126,8 @@ if dash == 'HR':
     col1, col2 = st.columns(2)
     col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(employee)])))
     col2.metric("Number of times in top 2", HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts())
-    #if HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts() > 5 :
-    #    st.balloons()
+    #if (HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts() > 5) :
+    #   st.balloons()
     
                 #Select a date to see the top 2 employee
     date = st.selectbox(
@@ -155,7 +142,8 @@ elif dash == 'Finance' :
     st.header('What is the turnover per country over the 2 last months ?')
     fig2, ax2 = plt.subplots()
     ax2.set_title('Total sales (in $) per country for the last two months')
-    sns.barplot(x = df_fin1['Country'], y = df_fin1['Total sales (in $)'], order=df_fin1.sort_values('Total sales (in $)').Country)
+    sns.barplot(x = df_fin1['Country'], y = df_fin1['Total sales (in $)'], order=df_fin1.sort_values('Total sales (in $)', ascending = False).Country, color = 'red')
+    plt.xticks(rotation=90)
     st.pyplot(fig2)
     #Finance 2
     # Find the total debt 
@@ -167,31 +155,29 @@ elif dash == 'Finance' :
     ax3.set_title('Debt (in $) per customer')
     ax3.set_ylabel('Amount (in $)')
     ax3.set_xlabel('Customer Number')
-    plt.bar(x= df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False).iloc[:,0].astype(str), height = df_fin2.sort_values(by = "Customer's debt  ($)",  ascending = False).iloc[:,2])
+    my_cmap = plt.get_cmap("Reds")
+    ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
+    plt.bar(x= ordered_df['Customer Number'].astype(str),
+            height = ordered_df["Customer's debt  ($)"],
+            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100))
+    
+    
+#    plt.bar(x= df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False).iloc[:,0].astype(str), height = df_fin2.sort_values(by = "Customer's debt  ($)",  ascending = False).iloc[:,2], color=my_cmap(df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False).iloc[:,3]/100), label = True)
     st.pyplot(fig3)
     st.write("Maybe it's time to contact them ?")
-
-    st.dataframe(df_fin2)
     
-elif dash == "Logistics":
-
-    st.title('This is the logistics dashboard !')
+    #Hide indexes
+    # CSS to inject contained in a string
+    hide_table_row_index = """
+            <style>
+            thead tr th:first-child {display:none}
+            tbody th {display:none}
+            </style>
+            """
+    # Inject CSS with Markdown
+    st.markdown(hide_table_row_index, unsafe_allow_html=True)
+    tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
+    tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
+    st.table(tempo_df)
     
-    st.header('these are the top 5 best seller products')
-    
-    fig, ax = plt.subplots(2, figsize=(20,10))
-    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
-
-    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-    ax[0].set_ylabel('Quantities ordered')
-    ax[0].set_xlabel('products')
-
-
-    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-    ax[1].set_ylabel('quantity')
-    ax[1].set_xlabel('products')
-    st.pyplot(fig)
-
    
