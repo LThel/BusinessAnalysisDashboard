@@ -83,6 +83,22 @@ on c.customerNumber = apc.customerNumber
 group by c.salesRepEmployeeNumber, MONTH(apc.orderDate), YEAR(apc.orderDate)) as almFinal) as almFinal) as almFinal 
 on almFinal.Employee_Number = e.employeeNumber)'''
 
+query_log = '''select p.productCode, p.productName, AvgPerMonth.Total_Quantity_Ordered, p.quantityInStock,  AvgPerMonth.average_quantity_orders_by_month as Average_quantity_orders_by_month, quantityInStock/AvgPerMonth.average_quantity_orders_by_month as How_many_months_left_we_have 
+from 
+(select od.productCode, (sum(od.quantityOrdered)/(count(distinct(month(o.orderDate)))*count(distinct(year(o.orderDate))))) as Average_quantity_orders_by_month, sum(od.quantityOrdered) as Total_Quantity_Ordered
+from orders as o 
+inner join orderdetails as od on o.orderNumber = od.orderNumber 
+where od.productCode in
+(select odbis.productCode
+from (select od.productCode 
+from orderdetails as od 
+group by productCode 
+order by sum(od.quantityOrdered) desc limit 5) as odbis) 
+group by productCode) as AvgPerMonth
+inner join products as p on p.productCode = AvgPerMonth.productCode 
+order by Total_Quantity_Ordered desc;'''
+
+
 
 
 #HR
@@ -97,6 +113,8 @@ df_fin2 = df_fin2.iloc[:,[0,1,4,5]]
 df_fin1 = df_fin1.rename(columns={"country":"Country", "amount_due":"Total sales (in $)", "Number_of_order" : "Total orders"})
 df_fin2 = df_fin2.rename(columns={"customerNumber": "Customer Number", "phone": "Phone Number", "Still_have_to_be_paid": "Customer's debt  ($)", "Proportion_of_credit_allows_already_reached": "Proportion of credit authorized already reached (in %)"})
 
+ #logistics
+df_log = pd.read_sql_query(query_log, connection)
 
 #Streamlite
 st.set_page_config(
@@ -162,6 +180,7 @@ elif dash == 'Finance' :
             color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100))
     st.pyplot(fig3)
     st.write("Maybe it's time to contact them ?")
+<<<<<<< Updated upstream
     
     #Hide indexes
     # CSS to inject contained in a string
@@ -178,3 +197,29 @@ elif dash == 'Finance' :
     st.table(tempo_df)
     
    
+=======
+
+    st.dataframe(df_fin2)
+    
+
+elif dash == "Logistics":
+
+    st.title('This is the logistics dashboard !')
+    
+    st.header('these are the top 5 best seller products')
+    
+    fig, ax = plt.subplots(2, figsize=(20,10))
+    fig.suptitle('Orders Quantities and Stock Left', fontsize = 15, fontweight="bold")
+
+    ax[0].bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[0].set_title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
+    ax[0].set_ylabel('Quantities ordered')
+    ax[0].set_xlabel('products')
+
+
+    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
+    ax[1].set_ylabel('quantity')
+    ax[1].set_xlabel('products')
+    st.pyplot(fig)
+>>>>>>> Stashed changes
