@@ -291,7 +291,7 @@ elif dash == 'Finance' :
 elif dash == 'Logistics':
     st.title ('Welcome to the logistics dashboard !')
     fig_to_disp = st.radio(
-    
+    "Choose a graphics",
     ('Total quantity ordered', 'Stock left', 'Average orders by month', 'How many month we have stock'))
     if fig_to_disp == 'Total quantity ordered':
         fig_orders, ax_orders = plt.subplots(figsize=(3, 1.5))
