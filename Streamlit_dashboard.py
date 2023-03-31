@@ -201,9 +201,23 @@ if dash == 'HR':
     date = st.selectbox(
     'Select the month to see the associated top 2 employees',
 (HR_df.month_year.unique()))
-    st.write('The first employee of the month is', HR_df['Employee_Name'][(HR_df['month_year']== date) & (HR_df['sales_rank']== 1)].iloc[0])
-    st.write('The second employee of the month is', HR_df['Employee_Name'][(HR_df['month_year']== date) & (HR_df['sales_rank']== 2)].iloc[0])
 
+    fst = 'The first employee of the month is ' + str(HR_df['Employee_Name'][(HR_df['month_year']== date) & (HR_df['sales_rank']== 1)].iloc[0])
+    scnd = 'The second employee of the month is ' + str(HR_df['Employee_Name'][(HR_df['month_year']== date) & (HR_df['sales_rank']== 2)].iloc[0])
+    
+    st.subheader(fst)
+    st.subheader(scnd)
+    
+    details = st.radio ('Do you want to see the amount of the sales for the selected month ?', ('Yes', 'No'))
+    if details == 'Yes':
+        fig10, ax10 = plt.subplots()
+        sns.barplot(x = HR_df['Employee_Name'][(HR_df['month_year']== date)], y = HR_df['Total_amount_of_money'][(HR_df['month_year']== date)], color = 'red') 
+        ax10.set_title('Total sales (in $) for the best two employee of the month')
+        ax10.set_ylabel('Total sales (in $)')
+        ax10.set_xlabel('Name of the employee')
+    #order=df_fin1.sort_values('Total_amount_of_money', ascending = False), color = 'red')
+        st.pyplot(fig10)
+    
 elif dash == 'Finance' :
     st.title('Welcome to the finance dashboard !')
     #Finance 1
@@ -231,6 +245,7 @@ elif dash == 'Finance' :
     ax3.bar(x= ordered_df['Customer Number'].astype(str),
             height = ordered_df["Customer's debt  ($)"],
             color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100), label = True)
+    
     #fig3.colorbar(ax3.pcolor(ordered_df["Proportion of credit authorized already reached (in %)"]))
     st.pyplot(fig3)
 
