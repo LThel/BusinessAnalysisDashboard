@@ -296,7 +296,7 @@ elif dash == 'Logistics':
     if fig_to_disp == 'Total quantity ordered':
         fig_orders, ax_orders = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = 'red')
-        plt.title('Total orders for the most ordered products', loc='left', fontweight = 'bold')
+        plt.title('Total orders for the most ordered products', loc='left', fontweight = 'bold', fontsize = 10)
         plt.xticks(rotation=90, fontsize = 7)
         plt.yticks(fontsize = 7)
         st.pyplot(fig_orders)
@@ -304,7 +304,7 @@ elif dash == 'Logistics':
     elif fig_to_disp == 'Stock left':
         fig_stockLeft, ax_stockL = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['quantityInStock'], color = 'red')
-        plt.title('Left stock', loc='left', fontweight='bold')
+        plt.title('Left stock', loc='left', fontweight='bold', fontsize = 10)
         plt.xticks(rotation=90, fontsize = 7)
         plt.yticks(fontsize = 7)
         st.pyplot(fig_stockLeft)
@@ -312,7 +312,7 @@ elif dash == 'Logistics':
     elif fig_to_disp == 'Average orders by month':
         fig_ordersByMonth, ax_ordersM = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = 'red')
-        plt.title('Average orders by month', loc='left', fontweight='bold')
+        plt.title('Average orders by month', loc='left', fontweight='bold', fontsize = 10)
         plt.xticks(rotation=90, fontsize = 7)
         plt.yticks(fontsize = 7)
         st.pyplot(fig_ordersByMonth)
@@ -320,7 +320,7 @@ elif dash == 'Logistics':
     elif fig_to_disp == 'How many month we have stock':
         fig_monthsWstock, ax_monthsStock = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = 'red')
-        plt.title('How many month we have stock', loc='left', fontweight='bold')
+        plt.title('How many month we have stock', loc='left', fontweight='bold', fontsize = 10)
         plt.xticks(rotation=90, fontsize = 7)
         plt.yticks(fontsize = 7)
         st.pyplot(fig_monthsWstock)
