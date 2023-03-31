@@ -13,6 +13,33 @@ connection = mysql.connector.connect(user = 'toyscie', password = 'WILD4Rdata!',
 #sql_engine = sql.create_engine(connection)
 
 #Connection to SQL
+
+#Connect to Sales query
+query_sales = '''with aggregated_data as (
+    select month(o.orderDate)                       as month
+    , year(o.orderDate)                             as year
+    , sum(d.quantityOrdered * d.priceEach)           as sales
+    , p.productLine                                 as productLine
+    from orders o
+    join orderdetails d on o.orderNumber = d.orderNumber
+    join products p on d.productCode = p.productCode
+    group by month(o.orderDate), year(o.orderDate), p.productLine  
+
+)
+select currentYear.month as month
+, currentYear.year as year
+, currentYear.sales as sales
+, currentYear.productLine  as productLine
+, lastYear.sales as last_year_sales
+, if(lastYear.sales is null or lastYear.sales = 0 , 0, 
+(((currentYear.sales - lastYear.sales) / lastYear.sales) *100) ) as exchange_Rate
+from aggregated_data currentYear
+left join aggregated_data lastYear on currentYear.month = lastYear.month 
+                    and currentYear.year -1 = lastYear.year
+                    and currentYear.productLine = lastYear.productLine'''
+
+# Connecting the SQL table to the Python
+df_sales = pd.read_sql_query(query_sales,connection)
 #Connect to finance query
 query_finance1 = '''select c.country, 
 sum(od.quantityOrdered*od.priceEach) as amount_due, 
@@ -313,3 +340,14 @@ elif dash == 'Sales':
     
 
 
+<<<<<<< Updated upstream
+=======
+    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
+    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
+    ax[1].set_ylabel('quantity')
+    ax[1].set_xlabel('products')
+
+    st.pyplot(fig)
+    
+    
+>>>>>>> Stashed changes
