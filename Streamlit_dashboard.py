@@ -237,11 +237,13 @@ if dash == 'HR':
     
     details = st.radio ('Do you want to see the amount of the sales for the selected month ?', ('Yes', 'No'))
     if details == 'Yes':
-        fig10, ax10 = plt.subplots()
+        fig10, ax10 = plt.subplots(figsize=(3, 1.5))
         sns.barplot(x = HR_df['Employee_Name'][(HR_df['month_year']== date)], y = HR_df['Total_amount_of_money'][(HR_df['month_year']== date)], color = 'red') 
         ax10.set_title('Total sales (in $) for the best two employee of the month')
         ax10.set_ylabel('Total sales (in $)')
         ax10.set_xlabel('Name of the employee')
+        plt.yticks(fontsize = 7)
+        plt.xticks(fontsize = 7)
     #order=df_fin1.sort_values('Total_amount_of_money', ascending = False), color = 'red')
         st.pyplot(fig10)
     
@@ -249,10 +251,11 @@ elif dash == 'Finance' :
     st.title('Welcome to the finance dashboard !')
     #Finance 1
     st.header('What is the turnover per country over the 2 last months ?')
-    fig2, ax2 = plt.subplots()
+    fig2, ax2 = plt.subplots(figsize=(3, 1.5))
     ax2.set_title('Total sales (in $) per country for the last two months')
     sns.barplot(x = df_fin1['Country'], y = df_fin1['Total sales (in $)'], order=df_fin1.sort_values('Total sales (in $)', ascending = False).Country, color = 'red')
-    plt.xticks(rotation=90)
+    plt.xticks(rotation=90, fontsize = 7)
+    plt.yticks(fontsize = 7)
     st.pyplot(fig2)
     total_turnover = sum(df_fin1['Total sales (in $)'])
     write_turnover = "The total turnover for the last 2 months reaches $" + str(round(total_turnover)) + "."
@@ -263,10 +266,12 @@ elif dash == 'Finance' :
     total_debt = round(total_debt)
     to_disp = 'But we still have $' + str(total_debt) + " to take back ! Where is our money then ?"
     st.subheader(to_disp)
-    fig3, ax3 = plt.subplots()
+    fig3, ax3 = plt.subplots(figsize=(3, 1.5))
     ax3.set_title('Debt (in $) per customer')
     ax3.set_ylabel('Amount (in $)')
     ax3.set_xlabel('Customer Number')
+    plt.xticks(rotation=90, fontsize = 7)
+    plt.yticks(fontsize = 7)
     my_cmap = plt.get_cmap("Reds")
     ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
     ax3.bar(x= ordered_df['Customer Number'].astype(str),
@@ -289,65 +294,67 @@ elif dash == 'Logistics':
     "You can see four different graphics",
     ('Total Quantity ordered', 'Stock left', 'Average orders by month', 'how many month we have stock'))
     if fig_to_disp == 'Total Quantity ordered':
-        fig_orders, ax_orders = plt.subplots()
+        fig_orders, ax_orders = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['Total_Quantity_Ordered'], color = 'red')
         plt.title('Total Orders for the most ordered products', loc='left', fontweight = 'bold')
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=90, fontsize = 7)
+        plt.yticks(fontsize = 7)
         st.pyplot(fig_orders)
    
     elif fig_to_disp == 'Stock left':
-        fig_stockLeft, ax_stockL = plt.subplots()
+        fig_stockLeft, ax_stockL = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['quantityInStock'], color = 'red')
         plt.title('Left Stock', loc='left', fontweight='bold')
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=90, fontsize = 7)
+        plt.yticks(fontsize = 7)
         st.pyplot(fig_stockLeft)
    
     elif fig_to_disp == 'Average orders by month':
-        fig_ordersByMonth, ax_ordersM = plt.subplots()
+        fig_ordersByMonth, ax_ordersM = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['Average_quantity_orders_by_month'], color = 'red')
         plt.title('Average orders by month', loc='left', fontweight='bold')
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=90, fontsize = 7)
+        plt.yticks(fontsize = 7)
         st.pyplot(fig_ordersByMonth)
 
     elif fig_to_disp == 'how many month we have stock':
-        fig_monthsWstock, ax_monthsStock = plt.subplots()
+        fig_monthsWstock, ax_monthsStock = plt.subplots(figsize=(3, 1.5))
         plt.bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = 'red')
         plt.title('How many month we have stock', loc='left', fontweight='bold')
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=90, fontsize = 7)
+        plt.yticks(fontsize = 7)
         st.pyplot(fig_monthsWstock)
 #Sales
 elif dash == 'Sales':
     st.title ('Welcome to the Sales Dashboard')
-    fig_sale1, ax_sale1 = plt.subplots()
+    fig_sale1, ax_sale1 = plt.subplots(figsize=(3, 1.5))
     plt.bar(df_sales ['productLine'], df_sales['sales'], color = 'red')
     plt.title('Sales per product line')
-    plt.xticks(rotation=90)   
+    plt.xticks(rotation=90, fontsize = 7)
+    plt.yticks(fontsize = 7)
     st.pyplot(fig_sale1)
     
-    fig_to_disp = st.radio(
-    "What exchange do you want to see ?",
-    ('Exchange Rate between 2021 and 2022', 'Exchange Rate between 2022 and 2023'))
-    if fig_to_disp == 'Exchange Rate between 2021 and 2022':
-        fig_ExchR2021_2022, ax_ExchR2021_2022 = plt.subplots()
-        plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['exchange_Rate'][df_sales['year'] == 2022], color = 'red')
-        plt.title ('Exchange Rate between 2021 and 2022')
-        st.pyplot(fig_ExchR2021_2022)
-    elif fig_to_disp == 'Exchange Rate between 2022 and 2023':
-        fig_ExchR2022_2023, ax_ExchR2022_2023 = plt.subplots()
-        plt.bar(df_sales ['month'][df_sales['year'] == 2023] , df_sales ['exchange_Rate'][df_sales['year'] == 2023], color = 'red')
-        plt.title ('Exchange Rate between 2022 and 2023')
-        st.pyplot(fig_ExchR2022_2023)
+    #Sales by month for the year 2021 and 2022 (SELECTBOX #2)
+              
+    options = ['Sales by month for the year of 2021','Sales by month for the year of 2022']
+    selected_optionsalespm = st.selectbox ('Select a table to view', options)
+    if selected_optionsalespm == 'Sales by month for the year of 2021':
+        fig_Salesbymonth2021, ax_Salesbymonth2021 = plt.subplots(figsize=(3, 2))
+        ax_Salesbymonth2021.bar(df_sales ['month'][df_sales['year'] == 2021] , df_sales ['sales'][df_sales['year'] == 2021], color = 'red')
+        plt.title ('Sales by month for the year of 2021')
+        plt.yticks(fontsize = 7)
+        plt.xticks(fontsize = 7)
+        st.pyplot(fig_Salesbymonth2021)
     
+    elif selected_optionsalespm == 'Sales by month for the year of 2022':
+        fig_Salesbymonth2022, ax_Salesbymonth2022 = plt.subplots(figsize=(3, 2))
+        plt.bar(df_sales ['month'][df_sales['year'] == 2022] , df_sales ['sales'][df_sales['year'] == 2022], color = 'red')
+        plt.title ('Sales by month for the year of 2022')
+        plt.yticks(fontsize = 7)
+        plt.xticks(fontsize = 7)
+        st.pyplot(fig_Salesbymonth2022)
 
+    st.write ("We can observe very high orders during the last months of the year. Considering that the product being sold by our company performs very similarly to the products sold by the physical toy market it is expected that Christmas turns out to be a considerably profitable period of the year")
 
-<<<<<<< Updated upstream
-=======
-    ax[1].bar(df_log['productName'], df_log['How_many_months_left_we_have'], color = ['red', 'blue', 'black', 'green', 'yellow'])
-    ax[1].set_title('Left Stock', loc='left', fontweight='bold')
-    ax[1].set_ylabel('quantity')
-    ax[1].set_xlabel('products')
-
-    st.pyplot(fig)
     
     
->>>>>>> Stashed changes
