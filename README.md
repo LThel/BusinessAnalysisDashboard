@@ -1,5 +1,4 @@
 # WCS-ToyModelProject
-First group project in WCS
 Have a look : 
 You can run our streamlit for our presentation here : (https://lthel-wcs-toymodelproject-streamlit-dashboard-kqdgza.streamlit.app/) (I, Louis, was responsible for the Finance part and the HR part)
 
