@@ -1,7 +1,9 @@
 # WCS-ToyModelProject
 First group project in WCS
+Have a look : 
+You can run our streamlit for our presentation here : (https://lthel-wcs-toymodelproject-streamlit-dashboard-kqdgza.streamlit.app/) (I, Louis, was responsible for the Finance part and the HR part)
 
-Introduction
+Context : 
 You are commissioned by a company selling models and scale models. 
 The company already has a database that lists employees, products, orders, and much more. 
 You are invited to browse and discover this database. 
@@ -11,7 +13,7 @@ On the morning of the demo, the data might be refreshed with new and fresh data 
 The director of the company wishes to have a dashboard which he could refresh each morning to have the latest information in order to manage the company.
 The manager does not want to do SQL, he wants to be able to access the data automatically and graphically, if possible through their google account, on the email or Drive. 
 
-Objective
+Objective :
 Your report should revolve around these 4 main topics: sales, finance, logistics, &  HR.
 Here are the indicators that should be present in your dashboard but in your advisory role, you are invited to propose additional KPIs and charts.
 Visualizations are very much appreciated. 
