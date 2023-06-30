@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from collections import Counter
 import mysql.connector
 from datetime import datetime
+from matplotlib.dates import date2num
+from matplotlib.pyplot import figure
 
 #Connect to Python
 #connection = 'mysql://toyscie:WILD4Rdata!@51.178.25.157:23456/toys_and_models'
@@ -159,6 +161,10 @@ HR_df = pd.read_sql_query(query_HR, connection)
 HR_df['month_year_bis'] = HR_df['month_year'].apply(lambda x: datetime.strptime(x, '%m-%Y'))
 HR_df = HR_df.sort_values(by = 'month_year_bis')
 
+HR_df2 = pd.read_sql_query(query_HR2, connection)
+HR_df2['month_year_bis'] = HR_df2['month_year'].apply(lambda x: datetime.strptime(x, '%m-%Y'))
+HR_df2 = HR_df2.sort_values(by = 'month_year_bis')
+
 #Finance
 df_fin1 = pd.read_sql_query(query_finance1, connection)
 df_fin2 = pd.read_sql_query(query_finance2, connection)
@@ -178,7 +184,7 @@ st.set_page_config(
 
 dash = st.sidebar.radio(
     "What dashboard do you want to see ?",
-    ('Sales', 'Finance', 'Logistics', 'HR'))
+    ('Finance', 'HR', 'Sales','Logistics'))
  
 #Hide indexes
 # CSS to inject contained in a string
@@ -193,101 +199,98 @@ st.markdown(hide_table_row_index, unsafe_allow_html=True)
     
 #HR
 if dash == 'HR':
-    st.title('Welcome to the HR dashboard !')
-    #Best employee
-    top1 = HR_df.Employee_Name.value_counts().head(1).index.format()
-    to_write = 'Well done '+ str(top1[0]) + ' ! You are the best employee over the last years'
-    st.subheader(to_write)
+    st.title('Welcome to the HR dashboard ! ✍️')
+    employee = st.selectbox('Select the name of an employee',(HR_df2.Employee_Name.unique()))
+    
+    #Metrics of the employee
+    subH1 = 'The stats of ' + employee + ' 📊'
+    st.subheader(subH1)
     col1, col2 = st.columns(2)
-    col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(top1[0])])))
-    col2.metric("Number of times in top 2", HR_df.Employee_Name.value_counts().head(1))
-    
-    #Top employees table
-    top_x = st.slider('Do you want to see our top employees ?', 0, 20, 5)
-    year_top_x = st.radio(    "Select the year",
-    ('All the years', 2023, 2022, 2021))
-    if year_top_x == 'All the years' :
-        st.table(HR_df.Employee_Name.value_counts().head(top_x).index.format())
-    else :
-        st.table(HR_df['Employee_Name'][HR_df['month_year_bis'].dt.year==year_top_x].value_counts().head(top_x).index.format())
+    col1.metric("Total sales 💵", round(sum(HR_df2['Total_amount_of_money'][HR_df2['Employee_Name']==employee])))
+    col2.metric("Number of times in top 2 🏆", HR_df2['Employee_Name'][(HR_df2['Employee_Name']==employee) & (HR_df2['sales_rank']<=2)].value_counts())
     
     
-    #Select the name of the employee to see if he/she appears in the top2
-    employee = st.selectbox('Select the name of the employee to see if he/she appears in our monthly top 2',(HR_df.Employee_Name.unique()))
-    to_write_selemployee = str(employee) + ' appears ' + str(HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0]) +  ' time in our monthly top 2.'
-    #st.write(employee, 'appears', HR_df['Employee_Name'][HR_df['Employee_Name']== employee].value_counts()[0], 'time in our monthly top 2. Have a look at the stats :')
-    st.subheader(to_write_selemployee)
-    st.write('Have a look at its stats :')
-    col1, col2 = st.columns(2)
-    col1.metric("Total sales ($)", round(sum(HR_df['Total_amount_of_money'][HR_df['Employee_Name']==str(employee)])))
-    col2.metric("Number of times in top 2", HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts())
-    #if (HR_df['Employee_Name'][HR_df['Employee_Name']==employee].value_counts() > 5) :
-    #st.balloons()
-    
-                #Select a date to see the top 2 employee
-    date = st.selectbox(
-    'Select the month to see the associated top 2 employees',
-(HR_df.month_year.unique()))
+    #Plot of the sales of the employee in comparison to the top2
+    subH2 = 'The monthly sales of ' + employee + ' 💰'
+    st.subheader(subH2)
+    wr1 = 'Have a look to ' + employee + ' monthly perfomances in comparison to our best employees 🥇 🥈 🥉'
+    st.write(wr1)
+    dates_employee = HR_df2['month_year_bis'][HR_df2['Employee_Name']==employee]                         
+    HR_correspondingDates = HR_df2[HR_df2['month_year_bis'].isin(dates_employee)]
+    tempo_df = HR_correspondingDates[(HR_correspondingDates['Employee_Name']==employee) | (HR_correspondingDates['sales_rank']<=2)][['Total_amount_of_money', 'Employee_Name', 'sales_rank', 'month_year_bis']]
+    fig1, ax = plt.subplots(figsize=(16, 6), dpi=80)
+    x = tempo_df['month_year_bis'].sort_values().unique()
+    x = date2num(x)
+    y = tempo_df['Total_amount_of_money'][tempo_df['Employee_Name']==employee]
+    y1 = tempo_df['Total_amount_of_money'][tempo_df['sales_rank']==1]
+    y2 = tempo_df['Total_amount_of_money'][tempo_df['sales_rank']==2]
+    bar1 = ax.bar(x-6, y, width=6, color='b', align='center')
+    bar2 = ax.bar(x, y1, width=6, color='g', align='center')
+    bar3 = ax.bar(x+6, y2, width=6, color='r', align='center')
+    ax.xaxis_date()
+    ax.legend((bar1[0], bar2[0], bar3[0]), (str(employee), '1st employee of the month', '2nd employee of the month') )
+    ax.set_ylabel('Total sales (in $)', fontsize = 14)
+    ax.set_xlabel('Date', fontsize = 14)
+    ax.set_title('Monthly sales of the selected employee in comparison to our best employees', fontsize = 14)
+    plt.xticks(rotation=90)
+    st.pyplot(fig1)
+                                                                        
 
-    fst = 'The first employee of the month is ' + str(HR_df['Employee_Name'][(HR_df['month_year']== date) & (HR_df['sales_rank']== 1)].iloc[0])
-    scnd = 'The second employee of the month is ' + str(HR_df['Employee_Name'][(HR_df['month_year']== date) & (HR_df['sales_rank']== 2)].iloc[0])
-    
-    st.subheader(fst)
-    st.subheader(scnd)
-    
-    details = st.radio ('Do you want to see the amount of the sales for the selected month ?', ('Yes', 'No'))
-    if details == 'Yes':
-        fig10, ax10 = plt.subplots(figsize=(3, 1.5))
-        sns.barplot(x = HR_df['Employee_Name'][(HR_df['month_year']== date)], y = HR_df['Total_amount_of_money'][(HR_df['month_year']== date)], color = 'red') 
-        ax10.set_title('Total sales (in $) for the best two employee of the month')
-        ax10.set_ylabel('Total sales (in $)')
-        ax10.set_xlabel('Name of the employee')
-        plt.yticks(fontsize = 7)
-        plt.xticks(fontsize = 7)
-    #order=df_fin1.sort_values('Total_amount_of_money', ascending = False), color = 'red')
-        st.pyplot(fig10)
-    
-elif dash == 'Finance' :
-    st.title('Welcome to the finance dashboard !')
-    #Finance 1
-    st.header('What is the turnover per country over the 2 last months ?')
-    fig2, ax2 = plt.subplots(figsize=(3, 1.5))
-    ax2.set_title('Total sales (in $) per country for the last two months')
-    sns.barplot(x = df_fin1['Country'], y = df_fin1['Total sales (in $)'], order=df_fin1.sort_values('Total sales (in $)', ascending = False).Country, color = 'red')
-    plt.xticks(rotation=90, fontsize = 7)
-    plt.yticks(fontsize = 7)
-    st.pyplot(fig2)
-    total_turnover = sum(df_fin1['Total sales (in $)'])
-    write_turnover = "The total turnover for the last 2 months reaches $" + str(round(total_turnover)) + "."
-    st.subheader(write_turnover)
-    #Finance 2
-    # Find the total debt 
-    total_debt = sum(df_fin2["Customer's debt  ($)"]) 
-    total_debt = round(total_debt)
-    to_disp = 'But we still have $' + str(total_debt) + " to take back ! Where is our money then ?"
-    st.subheader(to_disp)
-    fig3, ax3 = plt.subplots(figsize=(3, 1.5))
-    ax3.set_title('Debt (in $) per customer')
-    ax3.set_ylabel('Amount (in $)')
-    ax3.set_xlabel('Customer Number')
-    plt.xticks(rotation=90, fontsize = 7)
-    plt.yticks(fontsize = 7)
-    my_cmap = plt.get_cmap("Reds")
+elif dash == 'Finance':
+    st.title('Welcome to the finance dashboard ! 💸')
     ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
-    ax3.bar(x= ordered_df['Customer Number'].astype(str),
-            height = ordered_df["Customer's debt  ($)"],
-            color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100), label = True)
+    # create two columns for charts
+    fig_col1, fig_col2 = st.columns(2)
     
-    #fig3.colorbar(ax3.pcolor(ordered_df["Proportion of credit authorized already reached (in %)"]))
-    st.pyplot(fig3)
+    with fig_col1:
+        st.markdown(" **Turnover (in $) over the last two months** ")
+        fig2, ax2 = plt.subplots(figsize=(3, 1.5))
+        sns.barplot(x = df_fin1['Country'], y = df_fin1['Total sales (in $)'], order=df_fin1.sort_values('Total sales (in $)', ascending = False).Country, color = 'red')
+        plt.xticks(rotation=90, fontsize = 7)
+        plt.yticks(fontsize = 7)
+        plt.ylabel('Total sales (in $)', fontsize=8)
+        plt.xlabel('Country', fontsize=8)
+        st.write(fig2)
 
-    st.write("Maybe it's time to contact them ?")    
+    with fig_col2:
+        st.markdown("**Debt (in $) per customer**")
+        # Find the total debt 
+        total_debt = sum(df_fin2["Customer's debt  ($)"]) 
+        total_debt = round(total_debt)
+        to_disp = 'But we still have $' + str(total_debt) + " to take back ! Where is our money then ?"
+        #st.subheader(to_disp)
+        fig3, ax3 = plt.subplots(figsize=(3, 1.5))
+        #ax3.set_title('Debt (in $) per customer')
+        ax3.set_ylabel('Amount (in $)')
+        ax3.set_xlabel('Customer Number')
+        plt.xticks(rotation=90, fontsize = 7)
+        plt.yticks(fontsize = 7)
+        plt.ylabel('Debt (in $)', fontsize=8)
+        plt.xlabel('Customer number', fontsize=8)
+        my_cmap = plt.get_cmap("Reds")
+        ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
+        ax3.bar(x= ordered_df['Customer Number'].astype(str),
+                height = ordered_df["Customer's debt  ($)"],
+                color=my_cmap(ordered_df["Proportion of credit authorized already reached (in %)"]/100), label = True)
+        st.write(fig3)  
 
-
-    #tempo_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
-    #tempo_df = tempo_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]]
-    st.table(ordered_df.loc[:,['Customer Number', 'Phone Number', "Proportion of credit authorized already reached (in %)"]])
-
+    selected_customer = st.selectbox ('Select a customer number to have the relative informations', ordered_df.loc[:,['Customer Number']])   
+    # create three columns
+    kpi1, kpi2, kpi3 = st.columns(3)    
+    # fill in those three columns with respective metrics or KPIs
+    kpi1.metric(
+        label="Customer number 🙍‍♂️🙍‍♀️",
+        value=selected_customer,
+    )
+    kpi2.metric(
+        label="Phone number 📞",
+        value=str(ordered_df['Phone Number'][ordered_df['Customer Number']==selected_customer])[1:16],
+    )
+    kpi3.metric(
+        label="Credit reached (in %)💸",
+        value=ordered_df['Proportion of credit authorized already reached (in %)'][ordered_df['Customer Number']==selected_customer],
+    )
+    
 elif dash == 'Logistics':
     st.title ('Welcome to the logistics dashboard !')
     fig_to_disp = st.radio(
