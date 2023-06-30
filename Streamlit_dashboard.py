@@ -198,7 +198,7 @@ hide_table_row_index = """
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
     
 #HR
-if dash == 'HR':
+if dash == 'HR (Louis)':
     st.title('Welcome to the HR dashboard ! ✍️')
     employee = st.selectbox('Select the name of an employee',(HR_df2.Employee_Name.unique()))
     
@@ -236,7 +236,7 @@ if dash == 'HR':
     st.pyplot(fig1)
                                                                         
 
-elif dash == 'Finance':
+elif dash == 'Finance (Louis)':
     st.title('Welcome to the finance dashboard ! 💸')
     ordered_df = df_fin2.sort_values(by = "Customer's debt  ($)", ascending = False)
     # create two columns for charts
