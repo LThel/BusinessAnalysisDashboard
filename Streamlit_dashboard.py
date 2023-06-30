@@ -184,7 +184,7 @@ st.set_page_config(
 
 dash = st.sidebar.radio(
     "What dashboard do you want to see ?",
-    ('Finance', 'HR', 'Sales','Logistics'))
+    ('Finance (Louis)', 'HR (Louis)', 'Sales','Logistics'))
  
 #Hide indexes
 # CSS to inject contained in a string
