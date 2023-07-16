@@ -7,7 +7,7 @@ Please find a summary of the project below. To see more detail about the project
 **The team :**
 - Mauricio -
 - Joao -
-- Louis - Junior Data Analyst - Open to work or to join other collaborative projects !
+- Louis - Junior Data Analyst / ML  - Open to work or to join other collaborative projects !
 Linkedin : www.linkedin.com/in/louisthellier / CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing / Github : https://github.com/LThel
 
 **Context :**
