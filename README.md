@@ -5,9 +5,9 @@ You can run our streamlit for our presentation here : (https://lthel-wcs-toymode
 Please find a summary of the project below. To see more detail about the project see the link (please refer to p4 to see the structure of the Database) : https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing 
 
 **The team :**
-- Mauricio -
-- Joao -
-- Louis - Junior Data Analyst / ML  - Open to work or to join other collaborative projects !
+- Sales : Mauricio -
+- Logistics : Joao -
+- Finances & HR : Louis - Junior Data Analyst / ML  - Open to work or to join other collaborative projects !
 Linkedin : www.linkedin.com/in/louisthellier / CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing / Github : https://github.com/LThel
 
 **Context :**
