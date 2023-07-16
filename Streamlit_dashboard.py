@@ -1,22 +1,22 @@
-#=======================================Project 1 : An authomatized dashboard answering KPIs===============================================
-#Have a look to the resulting dashboard : https://lthel-wcs-toymodelproject-streamlit-dashboard-kqdgza.streamlit.app/
+# =======================================Project 1 : An authomatized dashboard answering KPIs===============================================
+# Have a look to the resulting dashboard : https://lthel-wcs-toymodelproject-streamlit-dashboard-kqdgza.streamlit.app/
 #===========================================================================================================================================
 # Technologies used : Python (Pandas, Matplotlib&Seaborn, SQLconnector), MySQL, Streamlit
 
-#Description of the project : 
-    #On this file we grouped all our codes together. We connect our SQL queries to Python, answer the KPIs and build the streamlit dashboard.
-    # KPIs to answer :
-        # Sales (Mauricio) : Number of products sold by category and by month, with comparison and rate of change compared to the same month of the previous year.
-        # Finances (Louis) : 1) The turnover of the orders of the last two months by country. 2) Orders that have not yet been paid.
-        # Logistics (Joao) : The stock of the 5 most ordered products.
-        # HR (Louis) : Each month, the 2 sellers with the highest turnover
-    #Find more details about the database structure and the projects here (https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing)
-#===========================================================================================================================================
-#The team :
-    #Mauricio
-    #Joao
-    #Louis - Junior Data Analyst - Open to work or to join other collaborative projects !(Linkedin : www.linkedin.com/in/louisthellier; CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing); Github : https://github.com/LThel;) 
-#===========================================================================================================================================
+# Description of the project :
+# On this file we grouped all our codes together. We connect our SQL queries to Python, answer the KPIs and build the streamlit dashboard.
+# KPIs to answer :
+# Sales (Mauricio) : Number of products sold by category and by month, with comparison and rate of change compared to the same month of the previous year.
+# Finances (Louis) : 1) The turnover of the orders of the last two months by country. 2) Orders that have not yet been paid.
+# Logistics (Joao) : The stock of the 5 most ordered products.
+# HR (Louis) : Each month, the 2 sellers with the highest turnover
+# Find more details about the database structure and the projects here (https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing)
+# ===========================================================================================================================================
+# The team :
+# Mauricio
+# Joao
+# Louis - Junior Data Analyst - Open to work or to join other collaborative projects !(Linkedin : www.linkedin.com/in/louisthellier; CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing); Github : https://github.com/LThel;)
+# ===========================================================================================================================================
 
 # Import the libraries
 import pandas as pd
@@ -41,10 +41,10 @@ connection = mysql.connector.connect(
 )
 
 
-#======================================================= Connection to SQL =================================================================
-#See the link to look at the database structure (page 4) : https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing
+# ======================================================= Connection to SQL=================================================================
+# See the link to look at the database structure (page 4) : https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing
 
-#======= Connect to Sales query (Mauricio)
+# ======= Connect to Sales query (Mauricio)
 query_sales = """with aggregated_data as (
     select month(o.orderDate)                       as month
     , year(o.orderDate)                             as year
@@ -69,8 +69,7 @@ left join aggregated_data lastYear on currentYear.month = lastYear.month
                     and currentYear.productLine = lastYear.productLine"""
 
 
-
-#======= Connect to finance query (Louis)
+# ======= Connect to finance query (Louis)
 query_finance1 = """select c.country, 
 sum(od.quantityOrdered*od.priceEach) as amount_due, 
 count(od.orderNumber) as Number_of_orders  
@@ -89,7 +88,7 @@ from payments group by customerNumber) as n on n.customerNumber = o.customerNumb
 group by o.customerNumber)
 Select * from Finance_per_customer as Fpc where Fpc.Still_have_to_be_paid <> 0; """
 
-#======= Connect to HR query (Louis)
+# ======= Connect to HR query (Louis)
 query_HR = """with final_df as
 (select concat(e.firstName,' ', e.lastName) as Employee_Name, e.employeeNumber, almFinal.Total_amount_of_money, almFinal.sales_rank, almFinal.month_year
 from employees as e 
@@ -139,7 +138,7 @@ on c.customerNumber = apc.customerNumber
 group by c.salesRepEmployeeNumber, MONTH(apc.orderDate), YEAR(apc.orderDate)) as almFinal) as almFinal) as almFinal 
 on almFinal.Employee_Number = e.employeeNumber)"""
 
-#======= Connect to logistic query (Joao)
+# ======= Connect to logistic query (Joao)
 query_log = """select p.productCode, p.productName, AvgPerMonth.Total_Quantity_Ordered, p.quantityInStock,  AvgPerMonth.average_quantity_orders_by_month as Average_quantity_orders_by_month, quantityInStock/AvgPerMonth.average_quantity_orders_by_month as How_many_months_left_we_have 
 from 
 (select od.productCode, (sum(od.quantityOrdered)/(count(distinct(month(o.orderDate)))*count(distinct(year(o.orderDate))))) as Average_quantity_orders_by_month, sum(od.quantityOrdered) as Total_Quantity_Ordered
@@ -155,8 +154,8 @@ group by productCode) as AvgPerMonth
 inner join products as p on p.productCode = AvgPerMonth.productCode 
 order by Total_Quantity_Ordered desc;"""
 
-#Read the queries and create the associated dataframe
-#Sales
+# Read the queries and create the associated dataframe
+# Sales
 df_sales = pd.read_sql_query(query_sales, connection)
 # HR
 HR_df = pd.read_sql_query(query_HR, connection)
@@ -195,9 +194,8 @@ df_fin2 = df_fin2.rename(
 df_log = pd.read_sql_query(query_log, connection)
 
 
-
-#=============================================================== Build the Streamlit dashboard ============================================
-# Webpage configuration 
+# =============================================================== Build the Streamlit dashboard ============================================
+# Webpage configuration
 st.set_page_config(
     page_title="Project 2 - Model company - Dashboarding ",
     page_icon=":smiley:",
@@ -214,7 +212,7 @@ hide_table_row_index = """
         """
 # Inject CSS with Markdown
 st.markdown(hide_table_row_index, unsafe_allow_html=True)
-#====================================================================================
+# ====================================================================================
 
 # Build the sidebar to go across the different dashboards
 dash = st.sidebar.radio(
@@ -222,15 +220,15 @@ dash = st.sidebar.radio(
     ("Finance (Louis)", "HR (Louis)", "Sales", "Logistics"),
 )
 
-#================================================ Build each of the different dashboards : =================================================
+# ================================================ Build each of the different dashboards :=================================================
 #===========================================================================================================================================
 
 
-#=================================== HR (Louis) =======================================
+# =================================== HR (Louis) =======================================
 if dash == "HR (Louis)":
     st.title("Welcome to the HR dashboard ! ✍️")
-    
-    #Select an employee name to see his stats
+
+    # Select an employee name to see his stats
     employee = st.selectbox(
         "Select the name of an employee", (HR_df2.Employee_Name.unique())
     )
@@ -252,7 +250,6 @@ if dash == "HR (Louis)":
         ].value_counts(),
     )
 
-    
     # Plot the sales of the selected employee in comparison to the top2 employees
     subH2 = "The monthly sales of " + employee + " 💰"
     st.subheader(subH2)
@@ -292,15 +289,15 @@ if dash == "HR (Louis)":
     st.pyplot(fig1)
 
 
-#=================================== Finance (Louis) =======================================
+# =================================== Finance (Louis) =======================================
 elif dash == "Finance (Louis)":
     st.title("Welcome to the finance dashboard ! 💸")
     ordered_df = df_fin2.sort_values(by="Customer's debt  ($)", ascending=False)
-    
+
     # create two columns for 2 charts side by side
     fig_col1, fig_col2 = st.columns(2)
- 
-    #Plot 1 : The turnover over the last 2 months
+
+    # Plot 1 : The turnover over the last 2 months
     with fig_col1:
         st.markdown(" **Turnover (in $) over the last two months** ")
         fig2, ax2 = plt.subplots(figsize=(3, 1.5))
@@ -316,7 +313,7 @@ elif dash == "Finance (Louis)":
         plt.xlabel("Country", fontsize=8)
         st.write(fig2)
 
-    #Plot 2 : The debt per customer        
+    # Plot 2 : The debt per customer
     with fig_col2:
         st.markdown("**Debt (in $) per customer**")
         # Find the total debt
@@ -349,14 +346,14 @@ elif dash == "Finance (Louis)":
         )
         st.write(fig3)
 
-    #Find the information the selected customer (idea : Contact if there is an associated debt)
+    # Find the information the selected customer (idea : Contact if there is an associated debt)
     selected_customer = st.selectbox(
         "Select a customer number to have the relative informations",
         ordered_df.loc[:, ["Customer Number"]],
     )
     # create three columns
     kpi1, kpi2, kpi3 = st.columns(3)
-    
+
     # fill in those three columns with respective metrics
     kpi1.metric(
         label="Customer number 🙍‍♂️🙍‍♀️",
@@ -376,8 +373,8 @@ elif dash == "Finance (Louis)":
             ordered_df["Customer Number"] == selected_customer
         ],
     )
-    
-#=================================== Logistic (Joao) =======================================
+
+# =================================== Logistic (Joao) =======================================
 elif dash == "Logistics":
     st.title("Welcome to the logistics dashboard !")
     fig_to_disp = st.radio(
@@ -433,8 +430,8 @@ elif dash == "Logistics":
         plt.xticks(rotation=90, fontsize=7)
         plt.yticks(fontsize=7)
         st.pyplot(fig_monthsWstock)
-        
-#=================================== Sales (Mauricio) =======================================
+
+# =================================== Sales (Mauricio) =======================================
 elif dash == "Sales":
     st.title("Welcome to the Sales Dashboard")
     fig_sale1, ax_sale1 = plt.subplots(figsize=(3, 1.5))
