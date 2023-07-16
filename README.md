@@ -33,3 +33,9 @@ Each month, the 2 sellers with the highest turnover.
 - Toy Project Playground : Different files we build to have a first touch with the datas, to build the connection between Python and SQL, build the first viz... All the manipulations needed to build the final version are gathered in the Streamlit_dashboard.py file.
 - requirements.txt : Text file with the python library we used and their versions. Require to build the Streamlit online.
 - Streamlit_dashboard.py : The main file that you should look at to see what was achieved in this project. The main code to build the streamlit application but not only : all the important steps required to build the final version of the work are there. 
+
+**The team :**
+- Mauricio -
+- Joao -
+- Louis - Junior Data Analyst - Open to work or to join other collaborative projects !
+Linkedin : www.linkedin.com/in/louisthellier / CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing / Github : https://github.com/LThel
