@@ -1,7 +1,14 @@
 **WCS-ToyModelProject**
 
 **Have a look :**
-You can run our streamlit for our presentation here : (https://lthel-wcs-toymodelproject-streamlit-dashboard-kqdgza.streamlit.app/) (I, Louis, was responsible for the Finance part and the HR part) - You can fin a summary of the project below. To see more detail about the project see the link (please refer to p4 to see the structure of the Database) : https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing 
+You can run our streamlit for our presentation here : (https://lthel-wcs-toymodelproject-streamlit-dashboard-kqdgza.streamlit.app/)
+Please find a summary of the project below. To see more detail about the project see the link (please refer to p4 to see the structure of the Database) : https://docs.google.com/document/d/1mgTrI8R9hoNygLpSDwa6rE6zk3PCcLtP_LnRBdSOLJs/edit?usp=sharing 
+
+**The team :**
+- Mauricio -
+- Joao -
+- Louis - Junior Data Analyst - Open to work or to join other collaborative projects !
+Linkedin : www.linkedin.com/in/louisthellier / CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing / Github : https://github.com/LThel
 
 **Context :**
 You are commissioned by a company selling models and scale models. 
@@ -12,6 +19,7 @@ The company also provides you with the script that you can run on your local MyS
 On the morning of the demo, the data might be refreshed with new and fresh data (and you might receive the update script if you do it locally). The demo should therefore display the latest available data.
 The director of the company wishes to have a dashboard which he could refresh each morning to have the latest information in order to manage the company.
 The manager does not want to do SQL, he wants to be able to access the data automatically and graphically, if possible through their google account, on the email or Drive. 
+
 
 **Objective :**
 Your report should revolve around these 4 main topics: sales, finance, logistics, &  HR.
@@ -34,8 +42,3 @@ Each month, the 2 sellers with the highest turnover.
 - requirements.txt : Text file with the python library we used and their versions. Require to build the Streamlit online.
 - Streamlit_dashboard.py : The main file that you should look at to see what was achieved in this project. The main code to build the streamlit application but not only : all the important steps required to build the final version of the work are there. 
 
-**The team :**
-- Mauricio -
-- Joao -
-- Louis - Junior Data Analyst - Open to work or to join other collaborative projects !
-Linkedin : www.linkedin.com/in/louisthellier / CV : https://drive.google.com/file/d/1vJm6Jv-W9RXXKj9dQcOAraonT1LXfUqI/view?usp=sharing / Github : https://github.com/LThel
