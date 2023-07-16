@@ -29,7 +29,7 @@ The stock of the 5 most ordered products.
 Human Resources: 
 Each month, the 2 sellers with the highest turnover.
 
-**The folder**
+**The folder :**
 - Toy Project Playground : Different files we build to have a first touch with the datas, to build the connection between Python and SQL, build the first viz... All the manipulations needed to build the final version are gathered in the Streamlit_dashboard.py file.
 - requirements.txt : Text file with the python library we used and their versions. Require to build the Streamlit online.
 - Streamlit_dashboard.py : The main file that you should look at to see what was achieved in this project. The main code to build the streamlit application but not only : all the important steps required to build the final version of the work are there. 
